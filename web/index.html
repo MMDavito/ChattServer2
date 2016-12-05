@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <textarea id="messageTextArea" rows="10" cols="45" readonly="readonly"></textarea>
+        <textarea id="usersTextArea" rows="10" cols="20" readonly="readonly"></textarea><br/>
+        <input type="text" placeholder="Add your username/message" id="messageInput"/><br/>
+        <input type="button" onclick="sendMessage()" value="Send"/>
+
+        <script>
+            var url = "ws://localhost:8080/ChattServer2/chatserver";
+            var ws = new WebSocket(url);
+            console.log(ws);
+
+            function sendMessage() {
+                ws.send(messageInput.value);
+                messageInput.value = "";
+            }
+            ws.onmessage = function process(message) {
+                var jsonData = JSON.parse(message.data);
+                if (Array.isArray(jsonData)) {//array = userS
+                    var output = "";
+                    for (var i = 0; i < jsonData.length; i++) {
+                        output += jsonData[i].username + "\n";                        
+                    }
+                    usersTextArea.value = output;
+                    document.getElementById("usersTextArea").scrollTop = document
+                            .getElementById("usersTextArea").scrollHeight;
+
+                } else {
+                    console.log("hatar dig " + jsonData.username + " och än mer ditt budskap " + jsonData.message);
+                    messageTextArea.value += jsonData.username + ":" + jsonData.message + "\n";
+                    document.getElementById("messageTextArea").scrollTop = document
+                            .getElementById("messageTextArea").scrollHeight;                    
+                }
+
+            };
+        </script>
+    </body>
+</html>
