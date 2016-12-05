@@ -50,8 +50,9 @@ public class ChattServerWSEnd {
             userSession.getUserProperties().put("username", message);
             userSession.getBasicRemote().sendText(buildJsonData("system", "You are connected as " + message));
 
-        }else if(message.substring(0, 3).equals("BOT")){
-            
+        }else if(message.substring(0, 1).equals("/")){
+            System.out.println("Du kommer hit");
+            nu.te4.support.Bot
         }
         else {
             String returnMessage = buildJsonData(username, message);
