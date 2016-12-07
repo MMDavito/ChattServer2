@@ -12,7 +12,6 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-import nu.te4.support.Bot;
 
 /**
  *
@@ -54,6 +53,8 @@ public class ChattServerWSEnd {
 
             //garanteed errors here. But aint got time for that.
         } else if (message.substring(0, 1).equals("/") && username != null) {
+            System.out.println("hall¨å");
+            System.out.println(username +" "+message);
             System.out.println("Du kommer hit");
             int i = checkString(username, message);
             //this is for troubleshooting
@@ -94,6 +95,7 @@ public class ChattServerWSEnd {
     }
 
     public int checkString(String sender, String botMessage) {
+        System.out.println("Du kommer till check");
         if (botMessage.indexOf(":") != -1) {
             //end of command (obs SPAM is 2 commands)
             int cmd = botMessage.indexOf(":");
@@ -104,12 +106,14 @@ public class ChattServerWSEnd {
             String returnMessage = "";
             String users = "";
             if (check.equals("USER:")) {
+                System.out.println("DU KOMMER TILL IFFFFF");
+                String reciever = message.substring(msg, message.indexOf(" "));
                 returnMessage = Json.createObjectBuilder()
-                        .add("username", message.substring(msg, message.indexOf(" ")))
+                        .add("username", sender)
                         .add("message", message.substring(message.indexOf(" "), message.length()))
                         .build().toString();
                 try {
-                    sendMessageToUser(sender, returnMessage);
+                    sendMessageToUser(reciever, returnMessage);
 
                 } catch (Exception e) {
                     System.out.println("Error " + e.getMessage());
@@ -123,7 +127,7 @@ public class ChattServerWSEnd {
                 try {
                     users = message.substring(0, message.indexOf("/"));
                     returnMessage = message.substring(message.indexOf("/") + 1, message.length());
-                    nu.te4.ws.ChattServerWSEnd.sendMessageToUsers(sender, users, returnMessage);
+                    sendMessageToUsers(sender, users, returnMessage);
 
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
@@ -149,11 +153,21 @@ public class ChattServerWSEnd {
     }
 
     //eats json formated as String.
-    public int sendMessageToUser(String sender, String jsonData) {
-        String returnMessage = Json.createObjectBuilder()
-                .add("username", message.substring(msg, message.indexOf(" ")))
-                .add("message", message.substring(message.indexOf(" "), message.length()))
-                .build().toString();
+    public int sendMessageToUser(String reciver, String message) {
+        System.out.println("du skickar till singularis här");
+        for (Session user : sessions) {
+            String taker = (String) user.getUserProperties().get("username");
+            if (taker.equals(reciver)) {
+                try {
+                    user.getBasicRemote().sendText(message);
+
+                } catch (Exception e) {
+                    System.out.println("ERROR: " + e.getMessage());
+                }                
+                return 1;
+            }
+        }
+
         return -1;
     }
 
