@@ -109,9 +109,9 @@ public class ChattServerWSEnd {
             String returnMessage = "";
             String users = "";
             if (check.equals("USER:")) {
-                System.out.println("DU KOMMER TILL IFFFFF");
-                String reciever = message.substring(msg, message.indexOf(" "));
-                System.out.println(reciever);
+                System.out.println("DU KOMMER TILL IFFFFF " + message);
+                String reciever = message.substring(0, message.indexOf(" "));
+                System.out.println(reciever + " hemsjvejs");
                 returnMessage = Json.createObjectBuilder()
                         .add("username", sender)
                         .add("message", message.substring(message.indexOf(" "), message.length()))
@@ -142,6 +142,8 @@ public class ChattServerWSEnd {
                 //succeded, return 1
                 return 1;
 
+            } else if (check.equals("SPAM:")) {
+                //CODELING HERE
             }
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
