@@ -54,7 +54,7 @@ public class ChattServerWSEnd {
             //garanteed errors here. But aint got time for that.
         } else if (message.substring(0, 1).equals("/") && username != null) {
             System.out.println("hall¨å");
-            System.out.println(username +" "+message);
+            System.out.println(username + " " + message);
             System.out.println("Du kommer hit");
             int i = checkString(username, message);
             //this is for troubleshooting
@@ -97,23 +97,29 @@ public class ChattServerWSEnd {
     public int checkString(String sender, String botMessage) {
         System.out.println("Du kommer till check");
         if (botMessage.indexOf(":") != -1) {
+            System.out.println("Du kommer till en command");
             //end of command (obs SPAM is 2 commands)
             int cmd = botMessage.indexOf(":");
             //Begining of message
             int msg = cmd + 1;
-            String check = botMessage.substring(0, msg);
+            System.out.println(cmd + " " + msg);
+            String check = botMessage.substring(1, msg);
             String message = botMessage.substring(msg, botMessage.length());
+            System.out.println(check + " " + message);
             String returnMessage = "";
             String users = "";
             if (check.equals("USER:")) {
                 System.out.println("DU KOMMER TILL IFFFFF");
                 String reciever = message.substring(msg, message.indexOf(" "));
+                System.out.println(reciever);
                 returnMessage = Json.createObjectBuilder()
                         .add("username", sender)
                         .add("message", message.substring(message.indexOf(" "), message.length()))
                         .build().toString();
                 try {
+                    System.out.println("Innan försök");
                     sendMessageToUser(reciever, returnMessage);
+                    System.out.println("Efter försök");
 
                 } catch (Exception e) {
                     System.out.println("Error " + e.getMessage());
@@ -145,7 +151,7 @@ public class ChattServerWSEnd {
             System.out.println("this is from bot: " + message);
             return -2;
         }
-        return -20;
+        return -10;
     }
 
     public static String friendlyBot(String greating) {
@@ -163,7 +169,7 @@ public class ChattServerWSEnd {
 
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e.getMessage());
-                }                
+                }
                 return 1;
             }
         }
