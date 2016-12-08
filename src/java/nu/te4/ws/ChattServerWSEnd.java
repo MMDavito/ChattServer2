@@ -53,7 +53,11 @@ public class ChattServerWSEnd {
             userSession.getBasicRemote().sendText(buildJsonData("system", "You are connected as " + message));
 
             //garanteed errors here. But aint got time for that.
-        } else if (message.substring(0, 1).equals("/") && username != null) {
+        } else if ((message.equals("help")) || message.equals("Help")) {
+            message = "/HELP";
+            checkString(username, message);
+
+        } else if (message.substring(0, 1).equals("/")) {
             System.out.println("hall¨å");
             System.out.println(username + " " + message);
             System.out.println("Du kommer hit");
@@ -97,17 +101,15 @@ public class ChattServerWSEnd {
 
     public int checkString(String sender, String botMessage) {
         System.out.println("Du kommer till check");
-        if(botMessage.substring(1,5).equals("HELP")){
-            String helpMessage ="USER:{username} {message}\n"
-                    + "WHISPER:{username,username2,unwieder} message\n"
+        if (botMessage.substring(1, 5).equals("HELP")) {
+            String helpMessage = "\nTo change your username, reload webpage"
+                    + "\n\nUSER:username message\n"
+                    + "WHISPER:username,username2,unwieder/message\n"
                     + "SPAM:secret";
-        String returnMessage;
-        returnMessage = Json.createObjectBuilder()
-                .add("username", "System")
-                .add("message", helpMessage).build().toString();
-                sendMessageToUser(sender, returnMessage);
-        }
-        else if(botMessage.indexOf(":") != -1) {
+            String returnMessage;
+            returnMessage = buildJsonData("Das Bååt", helpMessage);
+            sendMessageToUser(sender, returnMessage);
+        } else if (botMessage.indexOf(":") != -1) {
             System.out.println("Du kommer till en command");
             //end of command (obs SPAM is 2 commands)
             int cmd = botMessage.indexOf(":");
@@ -123,10 +125,7 @@ public class ChattServerWSEnd {
                 System.out.println("DU KOMMER TILL IFFFFF " + message);
                 String reciever = message.substring(0, message.indexOf(" "));
                 System.out.println(reciever + " hemsjvejs");
-                returnMessage = Json.createObjectBuilder()
-                        .add("username", sender)
-                        .add("message", message.substring(message.indexOf(" "), message.length()))
-                        .build().toString();
+                returnMessage = buildJsonData(sender, message.substring(message.indexOf(" "), message.length()));
                 try {
                     System.out.println("Innan försök");
                     int res = sendMessageToUser(reciever, returnMessage);
@@ -144,10 +143,14 @@ public class ChattServerWSEnd {
 
                 //should plan the strucktural designe of this else if...
             } else if (check.equals("WHISPER:")) {
+                System.out.println("Du kommer till whisper");
                 try {
+                    System.out.println(message);
                     users = message.substring(0, message.indexOf("/"));
-                    returnMessage = message.substring(message.indexOf("/") + 1, message.length());
-                    sendMessageToUsers(sender, users, returnMessage);
+                    message = message.substring(message.indexOf("/") + 1, message.length());
+                    returnMessage = buildJsonData(sender, message);
+                    sendMessageToUsers(users, returnMessage);
+                    System.out.println("Success sålångt");
 
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
@@ -194,22 +197,37 @@ public class ChattServerWSEnd {
         return -2;
     }
 
-    public int sendMessageToUsers(String sender, String usernames, String message) {
-        String returnMessage = buildJsonData(sender, message);
+    public int sendMessageToUsers(String usernames, String jsonData) {
+        System.out.println("Du kommer till users");
         ArrayList<String> li = new ArrayList<>();
         int comma;
+        li.add(usernames.substring(0, usernames.indexOf(",")));
+        usernames = usernames.substring(usernames.indexOf(","),usernames.length());
+        System.out.println("HÄrrr är random "+usernames);
         while (usernames.contains(",")) {
             comma = usernames.indexOf(",");
-            li.add(usernames.substring(0, comma));
-            usernames = usernames.substring(comma + 1);
+            usernames = usernames.substring(comma+1);
+            if(usernames.contains(",") == false &&usernames.length()>0){
+            li.add(usernames);
+                System.out.println("IF I WHISPERRRR");
+           break;
+            }
+            li.add(usernames.substring(0, usernames.indexOf(",")));
+            
+            
+            System.out.println(usernames);
         }
         try {
             for (Session user : sessions) {
+                System.out.println("Du kommer till for");
                 String reciver = (String) user.getUserProperties().get("username");
+                System.out.println(reciver+"  PRISA GUDARNA");
                 for (String recive : li) {
+                    System.out.println("MER KOMPLICERAT "+recive);
                     if (recive.equals(reciver)) {
+                        
                         //user.getBasicRemote().sendText(buildJsonUsers());
-                        user.getBasicRemote().sendText(message);
+                        user.getBasicRemote().sendText(jsonData);
                         return 1;
                     }
                 }
