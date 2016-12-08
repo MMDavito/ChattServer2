@@ -1,6 +1,7 @@
 package nu.te4.ws;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,7 +97,17 @@ public class ChattServerWSEnd {
 
     public int checkString(String sender, String botMessage) {
         System.out.println("Du kommer till check");
-        if (botMessage.indexOf(":") != -1) {
+        if(botMessage.substring(1,5).equals("HELP")){
+            String helpMessage ="USER:{username} {message}\n"
+                    + "WHISPER:{username,username2,unwieder} message\n"
+                    + "SPAM:secret";
+        String returnMessage;
+        returnMessage = Json.createObjectBuilder()
+                .add("username", "System")
+                .add("message", helpMessage).build().toString();
+                sendMessageToUser(sender, returnMessage);
+        }
+        else if(botMessage.indexOf(":") != -1) {
             System.out.println("Du kommer till en command");
             //end of command (obs SPAM is 2 commands)
             int cmd = botMessage.indexOf(":");
@@ -118,8 +129,11 @@ public class ChattServerWSEnd {
                         .build().toString();
                 try {
                     System.out.println("Innan försök");
-                    sendMessageToUser(reciever, returnMessage);
+                    int res = sendMessageToUser(reciever, returnMessage);
                     System.out.println("Efter försök");
+                    if (res < 0) {
+                        System.out.println("User don´t exist, or something " + res);
+                    }
 
                 } catch (Exception e) {
                     System.out.println("Error " + e.getMessage());
@@ -174,9 +188,10 @@ public class ChattServerWSEnd {
                 }
                 return 1;
             }
+            return -1;
         }
 
-        return -1;
+        return -2;
     }
 
     public int sendMessageToUsers(String sender, String usernames, String message) {
