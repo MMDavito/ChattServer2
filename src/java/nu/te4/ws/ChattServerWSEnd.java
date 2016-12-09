@@ -103,9 +103,9 @@ public class ChattServerWSEnd {
         System.out.println("Du kommer till check");
         if (botMessage.substring(1, 5).equals("HELP")) {
             String helpMessage = "\nTo change your username, reload webpage"
-                    + "\n\nUSER:username message\n"
-                    + "WHISPER:username,username2,unwieder/message\n"
-                    + "SPAM:secret";
+                    + "\n\n/USER:username message\n"
+                    + "/WHISPER:username,username2,unwieder message\n"
+                    + "/SPAM:secret";
             String returnMessage;
             returnMessage = buildJsonData("Das Bååt", helpMessage);
             sendMessageToUser(sender, returnMessage);
@@ -146,8 +146,8 @@ public class ChattServerWSEnd {
                 System.out.println("Du kommer till whisper");
                 try {
                     System.out.println(message);
-                    users = message.substring(0, message.indexOf("/"));
-                    message = message.substring(message.indexOf("/") + 1, message.length());
+                    users = message.substring(0, message.indexOf(" "));
+                    message = message.substring(message.indexOf(" ") + 1, message.length());
                     returnMessage = buildJsonData(sender, message);
                     sendMessageToUsers(users, returnMessage);
                     System.out.println("Success sålångt");
@@ -209,7 +209,7 @@ public class ChattServerWSEnd {
             usernames = usernames.substring(comma+1);
             if(usernames.contains(",") == false &&usernames.length()>0){
             li.add(usernames);
-                System.out.println("IF I WHISPERRRR");
+                System.out.println("IF I WHISPERRRR Like Gollumn");
            break;
             }
             li.add(usernames.substring(0, usernames.indexOf(",")));
@@ -228,10 +228,10 @@ public class ChattServerWSEnd {
                         
                         //user.getBasicRemote().sendText(buildJsonUsers());
                         user.getBasicRemote().sendText(jsonData);
-                        return 1;
+                        
                     }
                 }
-            }
+            }return 1;
         } catch (Exception e) {
             System.out.println("ERROR; " + e.getMessage());
         }

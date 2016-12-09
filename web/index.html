@@ -17,6 +17,11 @@ and open the template in the editor.
         <input type="button" onclick="sendMessage()" value="Send"/>
 
         <script>
+            document.getElementById("messageInput").addEventListener("keydown",function (e){
+                if(!e){var e = window.event;}
+                //ENTER IS KEY 13
+                if(e.keyCode === 13){sendMessage();}
+            },false);
             var url = "ws://localhost:8080/ChattServer2/chatserver";
             var ws = new WebSocket(url);
             console.log(ws);
