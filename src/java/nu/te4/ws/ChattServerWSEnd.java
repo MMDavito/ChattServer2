@@ -38,7 +38,8 @@ public class ChattServerWSEnd {
             user.getBasicRemote().sendText(buildJsonUsers());
             user.getBasicRemote().sendText(
                     buildJsonData("System",
-                            (String) userSession.getUserProperties().get("username") + " has left the room."));
+                            (String) userSession.getUserProperties()
+                                    .get("username") + " has left the room."));
 
         }
     }
@@ -54,7 +55,9 @@ public class ChattServerWSEnd {
             for (Session user : sessions) {
                 String tempUser = (String) user.getUserProperties().get("username");
                 if (tempUser != null && tempUser.equals(message)) {
-                    userSession.getBasicRemote().sendText(buildJsonData("System", "Username already exists"));
+                    userSession.getBasicRemote().sendText(
+                            buildJsonData("System", "Username already exists"));
+                    
                     temp = true;
                     break;
                 }
@@ -62,7 +65,8 @@ public class ChattServerWSEnd {
             //ELSE SET USERNAME AS FIRST MESSAGE
             if (temp == false) {
                 userSession.getUserProperties().put("username", message);
-                userSession.getBasicRemote().sendText(buildJsonData("System", "You are connected as " + message));
+                userSession.getBasicRemote().sendText(
+                        buildJsonData("System", "You are connected as " + message));
             }
         } //garanteed errors here. But aint got time for that.
         else if ((message.equals("help")) || message.equals("Help")) {
@@ -90,7 +94,9 @@ public class ChattServerWSEnd {
 
     private String buildJsonData(String username, String message) {
         //Creates json as String, formated as: {"username":username, "message":message}
-        return Json.createObjectBuilder().add("username", username).add("message", message).build().toString();
+        return Json.createObjectBuilder()
+                .add("username", username)
+                .add("message", message).build().toString();
     }
 
     private String buildJsonUsers() {
@@ -100,7 +106,8 @@ public class ChattServerWSEnd {
             try {
                 jsonArrayBuilder.add(
                         Json.createObjectBuilder()
-                        .add("username", (String) users.next().getUserProperties().get("username"))
+                        .add("username", (String) users.next()
+                                .getUserProperties().get("username"))
                         .build()
                 );
             } catch (Exception e) {
@@ -117,7 +124,8 @@ public class ChattServerWSEnd {
             System.out.println("DU KOMMER TILL HELPMESSAGE");
             String helpMessage = "\nTo change your username, reload webpage"
                     + "\n\n/USER:username message\n"
-                    + "/WHISPER:username,username2,unwieder message\nComma important,username isn't\n"
+                    + "/WHISPER:username,username2,unwieder message\n"
+                    + "Comma important,username isn't!!\n"
                     + "/SPAM:secret";
             String returnMessage;
             returnMessage = buildJsonData("Das Bååt", helpMessage);
@@ -139,7 +147,9 @@ public class ChattServerWSEnd {
                 System.out.println("DU KOMMER TILL IFFFFF " + message);
                 String reciever = message.substring(0, message.indexOf(" "));
                 System.out.println(reciever + " hemsjvejs");
-                returnMessage = buildJsonData(sender, message.substring(message.indexOf(" "), message.length()));
+                returnMessage = buildJsonData(sender, 
+                        message.substring(message.indexOf(" "), message.length()));
+                
                 try {
                     System.out.println("Innan försök");
                     int res = sendMessageToUser(reciever, returnMessage);
@@ -165,19 +175,21 @@ public class ChattServerWSEnd {
                     returnMessage = buildJsonData(sender, message);
                     sendMessageToUsers(users, returnMessage);
                     System.out.println("Success sålångt");
-
+                    //succeded, return 1
+                    return 1;
                 } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                     return -1;
                 }
-                //succeded, return 1
-                return 1;
 
             } else if (check.equals("SPAM:")) {
+                String sendBack = buildJsonData("SYSTEM", "YOU CAN´T DO THAT, "
+                        + "because I´m a cruel mastermind.");
+                sendMessageToUser(sender, sendBack);
+                return 1;
                 //CODELING HERE
             }
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-
             //KAN MAN HA EN JSONARRAY TOSTRING?
         } else {
             String message = friendlyBot(botMessage);
@@ -207,10 +219,9 @@ public class ChattServerWSEnd {
                     System.out.println("ERROR: " + e.getMessage());
                     return -1;
                 }
-                //SEE HOW MUTCH RETURNS NEEDED
             }
-
         }
+        //UNREACHABLE?
         return -2;
     }
 
@@ -252,8 +263,8 @@ public class ChattServerWSEnd {
         } catch (Exception e) {
             System.out.println("ERROR; " + e.getMessage());
         }
-
-        return -1;
+        //UNREACHABLE?
+        return -33;
     }
 
 }
