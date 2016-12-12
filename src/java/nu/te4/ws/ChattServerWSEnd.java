@@ -49,11 +49,23 @@ public class ChattServerWSEnd {
 
         //if user lacks username, set username as users first message
         if (username == null) {
-            userSession.getUserProperties().put("username", message);
-            userSession.getBasicRemote().sendText(buildJsonData("system", "You are connected as " + message));
-
-            //garanteed errors here. But aint got time for that.
-        } else if ((message.equals("help")) || message.equals("Help")) {
+            //SEE SESSION CONTAINS USERNAMES, AND IF USERNAME ALREADY EXISTS.
+            boolean temp = false;
+            for (Session user : sessions) {
+                String tempUser = (String) user.getUserProperties().get("username");
+                if (tempUser != null && tempUser.equals(message)) {
+                    userSession.getBasicRemote().sendText(buildJsonData("System", "Username already exists"));
+                    temp = true;
+                    break;
+                }
+            }
+            //ELSE SET USERNAME AS FIRST MESSAGE
+            if (temp == false) {
+                userSession.getUserProperties().put("username", message);
+                userSession.getBasicRemote().sendText(buildJsonData("System", "You are connected as " + message));
+            }
+        } //garanteed errors here. But aint got time for that.
+        else if ((message.equals("help")) || message.equals("Help")) {
             message = "/HELP";
             checkString(username, message);
 
@@ -102,12 +114,14 @@ public class ChattServerWSEnd {
     public int checkString(String sender, String botMessage) {
         System.out.println("Du kommer till check");
         if (botMessage.substring(1, 5).equals("HELP")) {
+            System.out.println("DU KOMMER TILL HELPMESSAGE");
             String helpMessage = "\nTo change your username, reload webpage"
                     + "\n\n/USER:username message\n"
-                    + "/WHISPER:username,username2,unwieder message\n"
+                    + "/WHISPER:username,username2,unwieder message\nComma important,username isn't\n"
                     + "/SPAM:secret";
             String returnMessage;
             returnMessage = buildJsonData("Das Bååt", helpMessage);
+            System.out.println(returnMessage);
             sendMessageToUser(sender, returnMessage);
         } else if (botMessage.indexOf(":") != -1) {
             System.out.println("Du kommer till en command");
@@ -180,20 +194,23 @@ public class ChattServerWSEnd {
     //eats json formated as String.
     public int sendMessageToUser(String reciver, String message) {
         System.out.println("du skickar till singularis här");
+        System.out.println(reciver);
         for (Session user : sessions) {
             String taker = (String) user.getUserProperties().get("username");
+            System.out.println("TAGARE::: " + taker);
             if (taker.equals(reciver)) {
                 try {
                     user.getBasicRemote().sendText(message);
+                    return 1;
 
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e.getMessage());
+                    return -1;
                 }
-                return 1;
+                //SEE HOW MUTCH RETURNS NEEDED
             }
-            return -1;
-        }
 
+        }
         return -2;
     }
 
@@ -202,36 +219,36 @@ public class ChattServerWSEnd {
         ArrayList<String> li = new ArrayList<>();
         int comma;
         li.add(usernames.substring(0, usernames.indexOf(",")));
-        usernames = usernames.substring(usernames.indexOf(","),usernames.length());
-        System.out.println("HÄrrr är random "+usernames);
+        usernames = usernames.substring(usernames.indexOf(","), usernames.length());
+        System.out.println("HÄrrr är random " + usernames);
         while (usernames.contains(",")) {
             comma = usernames.indexOf(",");
-            usernames = usernames.substring(comma+1);
-            if(usernames.contains(",") == false &&usernames.length()>0){
-            li.add(usernames);
+            usernames = usernames.substring(comma + 1);
+            if (usernames.contains(",") == false && usernames.length() > 0) {
+                li.add(usernames);
                 System.out.println("IF I WHISPERRRR Like Gollumn");
-           break;
+                break;
             }
             li.add(usernames.substring(0, usernames.indexOf(",")));
-            
-            
+
             System.out.println(usernames);
         }
         try {
             for (Session user : sessions) {
                 System.out.println("Du kommer till for");
                 String reciver = (String) user.getUserProperties().get("username");
-                System.out.println(reciver+"  PRISA GUDARNA");
+                System.out.println(reciver + "  PRISA GUDARNA");
                 for (String recive : li) {
-                    System.out.println("MER KOMPLICERAT "+recive);
+                    System.out.println("MER KOMPLICERAT " + recive);
                     if (recive.equals(reciver)) {
-                        
+
                         //user.getBasicRemote().sendText(buildJsonUsers());
                         user.getBasicRemote().sendText(jsonData);
-                        
+
                     }
                 }
-            }return 1;
+            }
+            return 1;
         } catch (Exception e) {
             System.out.println("ERROR; " + e.getMessage());
         }
