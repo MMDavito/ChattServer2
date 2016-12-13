@@ -1,7 +1,6 @@
 package nu.te4.ws;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,12 +22,21 @@ public class ChattServerWSEnd {
 
     static Set<Session> sessions = new HashSet<>();
 
+    /**
+     *
+     * @param userSession adds current userSession to sessions
+     */
     @OnOpen
     public void open(Session userSession) {
         sessions.add(userSession);
 
     }
 
+    /**
+     *
+     * @param userSession Removes current userSession from sessions.
+     * @throws IOException
+     */
     @OnClose
     public void close(Session userSession) throws IOException {
         sessions.remove(userSession);
@@ -44,13 +52,20 @@ public class ChattServerWSEnd {
         }
     }
 
+    /**
+     *
+     * @param message Message sent by user, to check if "botcommand", or normal
+     * Chattmessage.
+     * @param userSession userSession of the sender.
+     * @throws IOException
+     */
     @OnMessage
     public void onMessage(String message, Session userSession) throws IOException {
         String username = (String) userSession.getUserProperties().get("username");
 
         //if user lacks username, set username as users first message
         if (username == null) {
-            //SEE SESSION CONTAINS USERNAMES, AND IF USERNAME ALREADY EXISTS.
+            //SEE IF SESSIONS CONTAINS USERNAMES, AND IF USERNAME ALREADY EXISTS IN SESSIONS.
             boolean temp = false;
             for (Session user : sessions) {
                 String tempUser = (String) user.getUserProperties().get("username");
@@ -62,13 +77,14 @@ public class ChattServerWSEnd {
                     break;
                 }
             }
-            //ELSE SET USERNAME AS FIRST MESSAGE
+            //ELSE, SET USERNAME AS FIRST MESSAGE
             if (temp == false) {
                 userSession.getUserProperties().put("username", message);
                 userSession.getBasicRemote().sendText(
                         buildJsonData("System", "You are connected as " + message));
             }
-        } //garanteed errors here. But aint got time for that.
+        } //SE IF MESSAGE =HELP or normal variation of help,
+        //If so, send back a helpmessage
         else if ((message.equals("help")) || message.equals("Help")) {
             message = "/HELP";
             checkString(username, message);
@@ -118,6 +134,13 @@ public class ChattServerWSEnd {
         return jsonArrayBuilder.build().toString();
     }
 
+    /**
+     *
+     * @param sender selfexplaining
+     * @param botMessage it is the normal message, but I asume it is botmessage
+     * so if it isn´t botmessage i send it as normal message to all users.
+     * @return int to make testing easier, (no tests inluded).
+     */
     public int checkString(String sender, String botMessage) {
         System.out.println("Du kommer till check");
         if (botMessage.substring(1, 5).equals("HELP")) {
@@ -165,7 +188,7 @@ public class ChattServerWSEnd {
                 //succeded return 1
                 return 1;
 
-                //should plan the strucktural designe of this else if...
+                //should plan the strucktural design of this else if statement...
             } else if (check.equals("WHISPER:")) {
                 System.out.println("Du kommer till whisper");
                 try {
@@ -183,9 +206,9 @@ public class ChattServerWSEnd {
                 }
 
             } else if (check.equals("SPAM:")) {
-                String sendBack = buildJsonData("SYSTEM", "YOU CAN´T DO THAT, "
+                returnMessage = buildJsonData("SYSTEM", "YOU CAN´T DO THAT, "
                         + "because I´m a cruel mastermind.");
-                sendMessageToUser(sender, sendBack);
+                sendMessageToUser(sender, returnMessage);
                 return 1;
                 //CODELING HERE
             }
@@ -199,11 +222,23 @@ public class ChattServerWSEnd {
         return -10;
     }
 
+    /**
+     *
+     * @param greating
+     * @return
+     */
     public static String friendlyBot(String greating) {
         return greating;
     }
 
     //eats json formated as String.
+
+    /**
+     *
+     * @param reciver
+     * @param message
+     * @return
+     */
     public int sendMessageToUser(String reciver, String message) {
         System.out.println("du skickar till singularis här");
         System.out.println(reciver);
@@ -222,9 +257,15 @@ public class ChattServerWSEnd {
             }
         }
         //UNREACHABLE?
-        return -2;
+        return -15;
     }
 
+    /**
+     *
+     * @param usernames
+     * @param jsonData
+     * @return
+     */
     public int sendMessageToUsers(String usernames, String jsonData) {
         System.out.println("Du kommer till users");
         ArrayList<String> li = new ArrayList<>();
@@ -269,3 +310,4 @@ public class ChattServerWSEnd {
 
 }
 //https://www.youtube.com/watch?v=a8RUmnPL8aQ
+//IMplement some kind of "advanced"/external bot.
