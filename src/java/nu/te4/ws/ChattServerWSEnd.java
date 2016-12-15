@@ -40,14 +40,17 @@ public class ChattServerWSEnd {
     @OnClose
     public void close(Session userSession) throws IOException {
         sessions.remove(userSession);
+        String current = (String) userSession.getUserProperties().get("username");
+        if (current == null) {
+            current = "SuperSneacky_Spy";
+        }
         Iterator<Session> users = sessions.iterator();
         while (users.hasNext()) {
             Session user = users.next();
             user.getBasicRemote().sendText(buildJsonUsers());
             user.getBasicRemote().sendText(
                     buildJsonData("System",
-                            (String) userSession.getUserProperties()
-                                    .get("username") + " has left the room."));
+                            current + " has left the room."));
 
         }
     }
@@ -72,7 +75,7 @@ public class ChattServerWSEnd {
                 if (tempUser != null && tempUser.equals(message)) {
                     userSession.getBasicRemote().sendText(
                             buildJsonData("System", "Username already exists"));
-                    
+
                     temp = true;
                     break;
                 }
@@ -170,9 +173,9 @@ public class ChattServerWSEnd {
                 System.out.println("DU KOMMER TILL IFFFFF " + message);
                 String reciever = message.substring(0, message.indexOf(" "));
                 System.out.println(reciever + " hemsjvejs");
-                returnMessage = buildJsonData(sender, 
+                returnMessage = buildJsonData(sender,
                         message.substring(message.indexOf(" "), message.length()));
-                
+
                 try {
                     System.out.println("Innan försök");
                     int res = sendMessageToUser(reciever, returnMessage);
@@ -232,7 +235,6 @@ public class ChattServerWSEnd {
     }
 
     //eats json formated as String.
-
     /**
      *
      * @param reciver
@@ -256,7 +258,6 @@ public class ChattServerWSEnd {
                 }
             }
         }
-        //UNREACHABLE?
         return -15;
     }
 
@@ -304,7 +305,6 @@ public class ChattServerWSEnd {
         } catch (Exception e) {
             System.out.println("ERROR; " + e.getMessage());
         }
-        //UNREACHABLE?
         return -33;
     }
 
