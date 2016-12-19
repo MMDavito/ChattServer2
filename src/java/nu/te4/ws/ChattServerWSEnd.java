@@ -220,6 +220,8 @@ public class ChattServerWSEnd {
         } else {
             String message = friendlyBot(botMessage);
             System.out.println("this is from bot: " + message);
+            String returner = buildJsonData("System", message);
+            sendMessageToUser(sender, returner);
             return -2;
         }
         return -10;
@@ -227,18 +229,21 @@ public class ChattServerWSEnd {
 
     /**
      *
-     * @param greating
-     * @return
+     * @param greating Message by user (greating to bot)
+     * @return Later bot respond.
      */
     public static String friendlyBot(String greating) {
+        greating = ""
+                + "\nAnna is dead, "
+                + "\nwill resurrect, like christ"
+                + "\nin the year of 3137";
         return greating;
     }
 
-    //eats json formated as String.
     /**
      *
-     * @param reciver
-     * @param message
+     * @param reciver Name of user wished to send to
+     * @param message json formatted as String
      * @return
      */
     public int sendMessageToUser(String reciver, String message) {
@@ -263,8 +268,8 @@ public class ChattServerWSEnd {
 
     /**
      *
-     * @param usernames
-     * @param jsonData
+     * @param usernames Usernames, seperatead by comma
+     * @param jsonData data (message) String formatted as json
      * @return
      */
     public int sendMessageToUsers(String usernames, String jsonData) {
